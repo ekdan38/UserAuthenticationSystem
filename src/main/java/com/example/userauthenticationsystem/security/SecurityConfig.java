@@ -1,39 +1,47 @@
 package com.example.userauthenticationsystem.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final UserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll()
+                        .requestMatchers("/","/login").permitAll()
+                        .requestMatchers("/signup").anonymous()
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults()
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login")
                 )
-
+                .userDetailsService(userDetailsService)//커스컴 했기에 지정해줘야한다.
 
         ;
         return http.build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService(){
-        UserDetails user1 = User.withUsername("user1").password("{noop}1111").roles("USER").build();
-        return new InMemoryUserDetailsManager(user1);
+    public PasswordEncoder passwordEncoder(){
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+
 
 }

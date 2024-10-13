@@ -8,21 +8,21 @@ public class HomeController {
 
     @GetMapping("/")
     public String dashboard() {
-        return "login/dashboard";
+        return "dashboard";
     }
 
     @GetMapping("/user")
     public String user() {
-        return "login/user";
+        return "user";
     }
 
     @GetMapping("/manager")
     public String manager() {
-        return "login/manager";
+        return "manager";
     }
 
     @GetMapping("/admin")
     public String admin() {
-        return "login/admin";
+        return "admin";
     }
 }
