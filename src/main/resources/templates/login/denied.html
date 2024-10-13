@@ -92,23 +92,10 @@
             <div th:replace="~{layout/sidebar::sidebar}"></div>
         </div>
         <div class="col-md-10 content">
-            <div class="login-form">
-                <h2>Login</h2>
-                <div th:if="${param.error}" class="form-group">
-                    <span th:text="${exception}?: '잘못된 아이디나 암호입니다'" class="alert alert-danger"></span>
-                </div>
-                <form th:action="@{/login}" method="post">
-                    <input type="hidden" th:value="secret" th:name="secret_key">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
+            <div>
+                <h3 th:text="${exception}"></h3>
+                <br />
+                <span th:text="${username} != null ? ${username} + ' 님은 접근 권한이 없습니다' : '비 정상적인 접근입니다'" ></span>
             </div>
         </div>
     </div>
