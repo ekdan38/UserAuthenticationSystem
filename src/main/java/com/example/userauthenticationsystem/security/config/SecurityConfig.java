@@ -1,5 +1,6 @@
 package com.example.userauthenticationsystem.security.config;
 
+import com.example.userauthenticationsystem.security.filters.RestAuthenticationFilter;
 import com.example.userauthenticationsystem.security.formloginhandler.FormAccessDeniedHandler;
 import com.example.userauthenticationsystem.security.formloginhandler.FormAuthenticationFailHandler;
 import com.example.userauthenticationsystem.security.webauthenticationdetails.FormAuthenticationDetailsSource;
@@ -8,11 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -53,6 +58,10 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain restSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        AuthenticationManager authenticationManager = builder.build();
+
         http
                 .securityMatcher("/api/login")
                 .authorizeHttpRequests(auth -> auth
@@ -60,9 +69,17 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
+                .addFilterBefore(restAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
+                .authenticationManager(authenticationManager);
 
         ;
         return http.build();
+    }
+
+    private RestAuthenticationFilter restAuthenticationFilter(AuthenticationManager authenticationManager){
+        RestAuthenticationFilter restAuthenticationFilter = new RestAuthenticationFilter();
+        restAuthenticationFilter.setAuthenticationManager(authenticationManager);
+        return restAuthenticationFilter;
     }
 
 }
