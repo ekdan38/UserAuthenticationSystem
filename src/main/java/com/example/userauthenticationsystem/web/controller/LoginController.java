@@ -28,6 +28,12 @@ public class LoginController {
         return "/login/login";
     }
 
+    @GetMapping("/api/login")
+    public String login(){
+        return "/rest/login";
+    }
+
+
     @GetMapping("/signup")
     public String signup(){
         return "/login/signup";
@@ -47,8 +53,8 @@ public class LoginController {
     public String accessDenied(@RequestParam("exception") String exception,
                                @AuthenticationPrincipal CustomUserDetails details,
                                Model model){
-        CustomUserDetails principal = (CustomUserDetails)SecurityContextHolder
-                .getContextHolderStrategy().getContext().getAuthentication().getPrincipal(); //이렇게도 가능.
+//        CustomUserDetails principal = (CustomUserDetails)SecurityContextHolder
+//                .getContextHolderStrategy().getContext().getAuthentication().getPrincipal(); //이렇게도 가능.
         model.addAttribute("exception", exception);
         model.addAttribute("username", details.getAccountDto().getUsername());
         return "/login/denied";
