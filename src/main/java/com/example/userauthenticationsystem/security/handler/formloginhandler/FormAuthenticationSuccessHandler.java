@@ -1,4 +1,4 @@
-package com.example.userauthenticationsystem.security.formloginhandler;
+package com.example.userauthenticationsystem.security.handler.formloginhandler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

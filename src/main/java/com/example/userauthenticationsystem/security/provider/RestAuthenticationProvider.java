@@ -1,6 +1,7 @@
 package com.example.userauthenticationsystem.security.provider;
 
 import com.example.userauthenticationsystem.security.exception.SecretException;
+import com.example.userauthenticationsystem.security.token.RestAuthenticationToken;
 import com.example.userauthenticationsystem.security.userdetailsservice.FormUserDetailsService;
 import com.example.userauthenticationsystem.security.webauthenticationdetails.FormAuthenticationDetails;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-@Component("authenticationProvider")
+@Component("restAuthenticationProvider")
 @RequiredArgsConstructor
 @Slf4j
 public class RestAuthenticationProvider implements AuthenticationProvider {
@@ -35,23 +36,13 @@ public class RestAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Invalid password");
         }
 
-        String secretKey = ((FormAuthenticationDetails) authentication.getDetails()).getSecretKey();
-        String remoteAddress = ((FormAuthenticationDetails) authentication.getDetails()).getRemoteAddress();
-        String sessionId = ((FormAuthenticationDetails) authentication.getDetails()).getSessionId();
-        log.info("IP : [ " + remoteAddress + " ]");
-        log.info("SESSIONID : [ " + sessionId + " ]");
-
-        if(secretKey == null || !secretKey.equals("secret")){
-            throw new SecretException("Invalid secret");
-        }
-
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        return new RestAuthenticationToken(userDetails.getAuthorities(), null, userDetails);
         //userDails 대신 userDtails의 accoutdto도 가능하다.
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.isAssignableFrom(UsernamePasswordAuthenticationToken.class);
+        return authentication.isAssignableFrom(RestAuthenticationToken.class);
         //form 인증 방식이기 때문에 usernamePasswordAuthenticationToken이면 진행한다.
     }
 }

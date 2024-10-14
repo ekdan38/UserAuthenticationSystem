@@ -45,7 +45,7 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
 
         //Token 만들어주자. 커스텀해야한다.
 
-        RestAuthenticationToken restAuthenticationToken = new RestAuthenticationToken(accountDto.getUsername(), accountDto.getPassword());
+        RestAuthenticationToken restAuthenticationToken = new RestAuthenticationToken(accountDto.getPassword(), accountDto.getUsername());
         //AuthenticationFilter는 Authenticaion객체를 return 해줘야한다.
         return getAuthenticationManager().authenticate(restAuthenticationToken);
     }

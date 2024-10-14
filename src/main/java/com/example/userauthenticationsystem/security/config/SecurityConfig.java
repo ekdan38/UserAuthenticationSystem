@@ -1,10 +1,13 @@
 package com.example.userauthenticationsystem.security.config;
 
 import com.example.userauthenticationsystem.security.filters.RestAuthenticationFilter;
-import com.example.userauthenticationsystem.security.formloginhandler.FormAccessDeniedHandler;
-import com.example.userauthenticationsystem.security.formloginhandler.FormAuthenticationFailHandler;
+import com.example.userauthenticationsystem.security.handler.formloginhandler.FormAccessDeniedHandler;
+import com.example.userauthenticationsystem.security.handler.formloginhandler.FormAuthenticationFailHandler;
+import com.example.userauthenticationsystem.security.handler.restHandler.RestAuthenticationFailHandler;
+import com.example.userauthenticationsystem.security.handler.restHandler.RestAuthenticationSuccessHandler;
+import com.example.userauthenticationsystem.security.provider.RestAuthenticationProvider;
 import com.example.userauthenticationsystem.security.webauthenticationdetails.FormAuthenticationDetailsSource;
-import com.example.userauthenticationsystem.security.formloginhandler.FormAuthenticationSuccessHandler;
+import com.example.userauthenticationsystem.security.handler.formloginhandler.FormAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +18,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -25,8 +27,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
+    private final RestAuthenticationProvider restAuthenticationProvider;
     private final FormAuthenticationDetailsSource formAuthenticationDetailsSource;
     private final FormAuthenticationSuccessHandler formAuthenticationSuccessHandler;
+    private final RestAuthenticationSuccessHandler restAuthenticationSuccessHandler;
+    private final RestAuthenticationFailHandler restAuthenticationFailHandler;
     private final FormAuthenticationFailHandler formAuthenticationFailHandler;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -60,6 +65,7 @@ public class SecurityConfig {
     public SecurityFilterChain restSecurityFilterChain(HttpSecurity http) throws Exception {
 
         AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        builder.authenticationProvider(restAuthenticationProvider);
         AuthenticationManager authenticationManager = builder.build();
 
         http
@@ -79,6 +85,8 @@ public class SecurityConfig {
     private RestAuthenticationFilter restAuthenticationFilter(AuthenticationManager authenticationManager){
         RestAuthenticationFilter restAuthenticationFilter = new RestAuthenticationFilter();
         restAuthenticationFilter.setAuthenticationManager(authenticationManager);
+        restAuthenticationFilter.setAuthenticationSuccessHandler(restAuthenticationSuccessHandler);
+        restAuthenticationFilter.setAuthenticationFailureHandler(restAuthenticationFailHandler);
         return restAuthenticationFilter;
     }
 
